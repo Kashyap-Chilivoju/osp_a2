@@ -14,15 +14,16 @@ int main(int argc, char* argv[]) {
         algorithm = algorithm.substr(2);
 
     int quantum = 0;
+    loader dataLoader;
 
     if (algorithm == "rr" && argc != 3) {
         std::cerr << "For RR algorithm, you need to provide the quantum value." << std::endl;
         return 1;
     } else if (algorithm == "rr") {
-        quantum = std::stoi(argv[2]);
+        quantum = std::stoi(argv[1]);
+        filename = argv[2];
     }
 
-    loader dataLoader;
     std::vector<pcb> processes = dataLoader.loadData(filename);
     simulator sim(processes);
     if (algorithm == "fifo"&& argc == 2) {
