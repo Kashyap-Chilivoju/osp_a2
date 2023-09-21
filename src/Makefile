@@ -23,7 +23,7 @@ run: $(PROGRAMS)
 	@echo "\nRunning SJF with $(DATAFILE):"
 	@./sjf $(DATAFILE)
 	@echo "\nRunning RR with $(DATAFILE) and quantum = 50:"
-	@./rr $(DATAFILE) 50
+	@./rr 50 $(DATAFILE)
 
 clean:
 	@rm -f $(PROGRAMS)

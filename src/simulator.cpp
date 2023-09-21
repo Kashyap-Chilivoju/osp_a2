@@ -10,17 +10,20 @@ void simulator::fifo() {
 
     std::cout << "FIFO Scheduling:" << std::endl;
     std::cout << "------------------------------------------------------------------------------" << std::endl;
-    std::cout << "Process ID | Burst Time  | Turnaround Time | Waiting Time | Response Time    |" << std::endl;
+    std::cout << "Process ID | Burst Time  | Turnaround Time | Waiting Time | Response Time   ||" << std::endl;
     std::cout << "------------------------------------------------------------------------------" << std::endl;
 
     for (auto& process : processes) {
         osp2023::time_type processTime = process.total_time;
+        process.useTime(processTime); // using the time for the process
         currentTime += processTime;
-        process.useTime(processTime);
+
 
         osp2023::time_type turnaroundTime = currentTime; // Since arrival time is 0 for all in FIFO
         osp2023::time_type waitingTime = turnaroundTime - processTime;
         osp2023::time_type responseTime = waitingTime; // In FIFO, response time is same as waiting time
+
+        process.total_wait_time += waitingTime; // updating total wait time for the process
 
         totalTurnaroundTime += turnaroundTime;
         totalWaitingTime += waitingTime;
@@ -38,11 +41,13 @@ void simulator::fifo() {
     int numProcesses = processes.size();
 
     std::cout << "\nFIFO Average Metrics:" << std::endl;
-    std::cout << "---------------------" << std::endl;
-    std::cout << "Average Turnaround Time: " << totalTurnaroundTime / numProcesses << " ms" << std::endl;
-    std::cout << "Average Waiting Time: " << totalWaitingTime / numProcesses << " ms" << std::endl;
-    std::cout << "Average Response Time: " << totalResponseTime / numProcesses << " ms" << std::endl<< std::endl;
+    std::cout << "------------------------------------" << std::endl;
+    std::cout << "Average Turnaround Time: " << totalTurnaroundTime/numProcesses << " ms   |" << std::endl;
+    std::cout << "Average Waiting Time: " << totalWaitingTime/numProcesses<< " ms\t   |" << std::endl;
+    std::cout << "Average Response Time: " << totalResponseTime/numProcesses << " ms\t   |" << std::endl;
+    std::cout << "------------------------------------" << std::endl;
 }
+
 
 
 bool compareTotalTime(const pcb& a, const pcb& b) {
@@ -59,7 +64,7 @@ void simulator::sjf() {
 
     std::cout << "SJF Scheduling:" << std::endl;
     std::cout << "------------------------------------------------------------------------------" << std::endl;
-    std::cout << "Process ID | Burst Time  | Turnaround Time | Waiting Time | Response Time    |" << std::endl;
+    std::cout << "Process ID | Burst Time  | Turnaround Time | Waiting Time | Response Time   ||" << std::endl;
     std::cout << "------------------------------------------------------------------------------" << std::endl;
 
     for (const auto& process : processes) {
@@ -85,11 +90,14 @@ void simulator::sjf() {
 
     int numProcesses = processes.size();
 
+    std::cout << "------------------------------------------------------------------------------" << std::endl;
+
     std::cout << "\nSJF Average Metrics:" << std::endl;
-    std::cout << "---------------------" << std::endl;
-    std::cout << "Average Turnaround Time: " << totalTurnaroundTime / numProcesses << " ms" << std::endl;
-    std::cout << "Average Waiting Time: " << totalWaitingTime / numProcesses << " ms" << std::endl;
-    std::cout << "Average Response Time: " << totalResponseTime / numProcesses << " ms" << std::endl << std::endl;
+    std::cout << "------------------------------------" << std::endl;
+    std::cout << "Average Turnaround Time: " << totalTurnaroundTime / numProcesses << " ms   |" << std::endl;
+    std::cout << "Average Waiting Time: " << totalWaitingTime / numProcesses << " ms\t   |" << std::endl;
+    std::cout << "Average Response Time: " << totalResponseTime / numProcesses << " ms\t   |" << std::endl;
+    std::cout << "------------------------------------" << std::endl;
 }
 
 
@@ -100,14 +108,7 @@ void simulator::rr(int quantum) {
     }
 
     int n = processes.size();
-    std::vector<int> remaining_time(n);
     std::vector<bool> first_response(n, true); // To track first-time execution
-    std::vector<osp2023::time_type> response_times(n, 0);
-    std::vector<osp2023::time_type> waiting_times(n, 0);
-    std::vector<osp2023::time_type> turnaround_times(n, 0);
-
-    for (int i = 0; i < n; i++)
-        remaining_time[i] = processes[i].total_time;
 
     osp2023::time_type currentTime = 0;
 
@@ -115,23 +116,25 @@ void simulator::rr(int quantum) {
         bool done = true;
 
         for (int i = 0; i < n; i++) {
-            if (remaining_time[i] > 0) {
+            pcb& process = processes[i];
+            osp2023::time_type remaining_time = process.getTimeRemaining();
+
+            if (remaining_time > 0) {
                 done = false;
 
                 if (first_response[i]) {
-                    response_times[i] = currentTime;
+                    process.last_cpu_time = currentTime; // Assuming this is when it first responded
                     first_response[i] = false;
                 }
 
-                if (remaining_time[i] > quantum) {
+                if (remaining_time > quantum) {
                     currentTime += quantum;
-                    waiting_times[i] += (currentTime - quantum - response_times[i]);
-                    remaining_time[i] -= quantum;
+                    process.total_wait_time += (currentTime - quantum - process.last_cpu_time);
+                    process.useTime(quantum);
                 } else {
-                    currentTime += remaining_time[i];
-                    turnaround_times[i] = currentTime;
-                    waiting_times[i] += (currentTime - remaining_time[i] - response_times[i]);
-                    remaining_time[i] = 0;
+                    currentTime += remaining_time;
+                    process.total_wait_time += (currentTime - remaining_time - process.last_cpu_time);
+                    process.useTime(remaining_time);
                 }
             }
         }
@@ -142,33 +145,35 @@ void simulator::rr(int quantum) {
 
     std::cout << "RR Scheduling (Quantum: " << quantum << "ms):" << std::endl;
     std::cout << "------------------------------------------------------------------------------" << std::endl;
-    std::cout << "Process ID | Burst Time  | Turnaround Time | Waiting Time | Response Time    |" << std::endl;
+    std::cout << "Process ID | Burst Time  | Turnaround Time | Waiting Time | Response Time   ||" << std::endl;
     std::cout << "------------------------------------------------------------------------------" << std::endl;
 
     osp2023::time_type totalTurnaroundTime = 0;
     osp2023::time_type totalWaitingTime = 0;
     osp2023::time_type totalResponseTime = 0;
 
-    for (int i = 0; i < n; i++) {
-        totalTurnaroundTime += turnaround_times[i];
-        totalWaitingTime += waiting_times[i];
-        totalResponseTime += response_times[i];
+    for (const auto& process : processes) {
+        osp2023::time_type turnaroundTime = process.total_time + process.total_wait_time;
+        totalTurnaroundTime += turnaroundTime;
+        totalWaitingTime += process.total_wait_time;
+        totalResponseTime += process.last_cpu_time; // Assuming last_cpu_time is the response time
 
-        std::cout << processes[i].id << "\t   | "
-                  << processes[i].total_time << " ms\t | "
-                  << turnaround_times[i] << " ms\t   | "
-                  << waiting_times[i] << " ms\t  | "
-                  << response_times[i] << " ms\t    ||" << std::endl;
+        std::cout << process.id << "\t   | "
+                  << process.total_time << " ms\t | "
+                  << turnaroundTime << " ms\t   | "
+                  << process.total_wait_time << " ms\t  | "
+                  << process.last_cpu_time << " ms\t    ||" << std::endl;
     }
 
     std::cout << "------------------------------------------------------------------------------" << std::endl;
-
     std::cout << "\nRR Average Metrics (Quantum: " << quantum << "ms):" << std::endl;
-    std::cout << "---------------------" << std::endl;
-    std::cout << "Average Turnaround Time: " << totalTurnaroundTime / n << " ms" << std::endl;
-    std::cout << "Average Waiting Time: " << totalWaitingTime / n << " ms" << std::endl;
-    std::cout << "Average Response Time: " << totalResponseTime / n << " ms" << std::endl << std::endl;
+    std::cout << "------------------------------------" << std::endl;
+    std::cout << "Average Turnaround Time: " << totalTurnaroundTime / n << " ms   |" << std::endl;
+    std::cout << "Average Waiting Time: " << totalWaitingTime / n << " ms\t   |" << std::endl;
+    std::cout << "Average Response Time: " << totalResponseTime / n << " ms\t   |" << std::endl;
+    std::cout << "------------------------------------" << std::endl;
 }
+
 
 
 
