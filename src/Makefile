@@ -4,7 +4,7 @@ SOURCES = main.cpp simulator.cpp pcb.cpp loader.cpp
 PROGRAMS = fifo sjf rr
 DATAFILE = datafile
 
-all: build run
+all: build run clean
 
 build: $(PROGRAMS)
 
