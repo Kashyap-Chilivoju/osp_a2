@@ -23,6 +23,8 @@ public:
     // what time was this process last on the cpu?
     osp2023::time_type last_cpu_time = osp2023::time_not_set;
 
+    osp2023::time_type response_time = osp2023::time_not_set;
+
     // max and min duration for a process in our system.
     static const osp2023::time_type MAX_DURATION = 100;
     static const osp2023::time_type MIN_DURATION = 10;
