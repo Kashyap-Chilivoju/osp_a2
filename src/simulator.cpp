@@ -9,10 +9,10 @@ void simulator::fifo() {
     osp2023::time_type totalWaitingTime = 0;
     osp2023::time_type totalResponseTime = 0;
 
-    std::cout << "FIFO Scheduling:" << std::endl;
-    std::cout << "------------------------------------------------------------------------------" << std::endl;
-    std::cout << "Process ID | Burst Time  | Turnaround Time | Waiting Time | Response Time   ||" << std::endl;
-    std::cout << "------------------------------------------------------------------------------" << std::endl;
+//    std::cout << "FIFO Scheduling:" << std::endl;
+//    std::cout << "------------------------------------------------------------------------------" << std::endl;
+//    std::cout << "Process ID | Burst Time  | Turnaround Time | Waiting Time | Response Time   ||" << std::endl;
+//    std::cout << "------------------------------------------------------------------------------" << std::endl;
 
     for (auto &process: processes) {
         // If last_cpu_time is not set, it means it's the process's first time on the CPU
@@ -34,14 +34,14 @@ void simulator::fifo() {
         totalWaitingTime += waitingTime;
         totalResponseTime += responseTime;
 
-        std::cout << process.id << "\t   | "
-                  << processTime << " ms\t | "
-                  << turnaroundTime << " ms\t   | "
-                  << waitingTime << " ms\t  | "
-                  << responseTime << " ms\t    ||" << std::endl;
+//        std::cout << process.id << "\t   | "
+//                  << processTime << " ms\t | "
+//                  << turnaroundTime << " ms\t   | "
+//                  << waitingTime << " ms\t  | "
+//                  << responseTime << " ms\t    ||" << std::endl;
     }
 
-    std::cout << "------------------------------------------------------------------------------" << std::endl;
+//    std::cout << "------------------------------------------------------------------------------" << std::endl;
 
     int numProcesses = processes.size();
 
@@ -66,10 +66,10 @@ void simulator::sjf() {
     osp2023::time_type totalWaitingTime = 0;
     osp2023::time_type totalResponseTime = 0;
 
-    std::cout << "SJF Scheduling:" << std::endl;
-    std::cout << "------------------------------------------------------------------------------" << std::endl;
-    std::cout << "Process ID | Burst Time  | Turnaround Time | Waiting Time | Response Time   ||" << std::endl;
-    std::cout << "------------------------------------------------------------------------------" << std::endl;
+//    std::cout << "SJF Scheduling:" << std::endl;
+//    std::cout << "------------------------------------------------------------------------------" << std::endl;
+//    std::cout << "Process ID | Burst Time  | Turnaround Time | Waiting Time | Response Time   ||" << std::endl;
+//    std::cout << "------------------------------------------------------------------------------" << std::endl;
 
     for (auto &process: processes) {
         // If last_cpu_time is not set, it means it's the process's first time on the CPU.
@@ -91,14 +91,14 @@ void simulator::sjf() {
         totalWaitingTime += waitingTime;
         totalResponseTime += responseTime;
 
-        std::cout << process.id << "\t   | "
-                  << processTime << " ms\t | "
-                  << turnaroundTime << " ms\t   | "
-                  << waitingTime << " ms\t  | "
-                  << responseTime << " ms\t    ||" << std::endl;
+//        std::cout << process.id << "\t   | "
+//                  << processTime << " ms\t | "
+//                  << turnaroundTime << " ms\t   | "
+//                  << waitingTime << " ms\t  | "
+//                  << responseTime << " ms\t    ||" << std::endl;
     }
 
-    std::cout << "------------------------------------------------------------------------------" << std::endl;
+//    std::cout << "------------------------------------------------------------------------------" << std::endl;
 
     int numProcesses = processes.size();
 
@@ -124,13 +124,13 @@ void simulator::rr(int quantum) {
         readyQueue.push_back(&process);
     }
 
-    std::cout << "RR Scheduling (Quantum: " << quantum << "ms):" << std::endl;
-    std::cout << "-----------------------------------------------------------------------------------------------"
-              << std::endl;
-    std::cout << "Process ID | Burst Time  | Time Remaining | Turnaround Time  | Waiting Time | Response Time  ||"
-              << std::endl;
-    std::cout << "-----------------------------------------------------------------------------------------------"
-              << std::endl;
+//    std::cout << "RR Scheduling (Quantum: " << quantum << "ms):" << std::endl;
+//    std::cout << "-----------------------------------------------------------------------------------------------"
+//              << std::endl;
+//    std::cout << "Process ID | Burst Time  | Time Remaining | Turnaround Time  | Waiting Time | Response Time  ||"
+//              << std::endl;
+//    std::cout << "-----------------------------------------------------------------------------------------------"
+//              << std::endl;
 
     while (!readyQueue.empty()) {
         pcb *process = readyQueue.front();
@@ -156,16 +156,16 @@ void simulator::rr(int quantum) {
         process->total_wait_time = currentTime - process->time_used;
 
         osp2023::time_type turnaroundTime = process->time_used + process->total_wait_time;
-        std::cout << process->id << "\t   | "
-                  << process->total_time << " ms\t | "
-                  << process->getTimeRemaining() << " ms left\t  | "
-                  << turnaroundTime << " ms\t     | "
-                  << process->total_wait_time << " ms\t    | "
-                  << process->response_time << " ms\t     ||" << std::endl;
+//        std::cout << process->id << "\t   | "
+//                  << process->total_time << " ms\t | "
+//                  << process->getTimeRemaining() << " ms left\t  | "
+//                  << turnaroundTime << " ms\t     | "
+//                  << process->total_wait_time << " ms\t    | "
+//                  << process->response_time << " ms\t     ||" << std::endl;
     }
 
-    std::cout << "-----------------------------------------------------------------------------------------------"
-              << std::endl;
+//    std::cout << "-----------------------------------------------------------------------------------------------"
+//              << std::endl;
     std::cout << "\nRR Average Metrics (Quantum: " << quantum << "ms):" << std::endl;
     std::cout << "------------------------------------" << std::endl;
 
