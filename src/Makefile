@@ -2,7 +2,7 @@
 CFLAGS = -std=c++11 -Wall -Wextra -Werror
 SOURCES = main.cpp simulator.cpp pcb.cpp loader.cpp
 PROGRAMS = fifo sjf rr
-DATAFILE = datafile
+DATAFILE = datafile #insert data here
 
 all: build run clean
 
